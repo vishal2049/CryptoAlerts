@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#666567</color>
+    <color name="colorPrimaryDark">#2A292C</color>
+    <color name="colorAccent">#03DAC5</color>
+    <color name="Alert_btn">#FFC107</color>
+    <color name="text_color">#7E7D7A</color>
+    <color name="alert_parent_background">#212022</color>
+</resources>

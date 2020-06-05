@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="32dp"
+    android:orientation="horizontal"
+    android:layout_marginTop="5dp"
+    android:weightSum="100">
+
+    <TextView
+        android:id="@+id/Rsymbol"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="BTC/USDT"
+        android:textSize="16dp"
+        android:textAlignment="viewStart"
+        android:fontFamily="@font/lato"
+        android:textColor="#ffffff"
+        android:layout_marginLeft="15dp"
+        android:layout_weight="45"/>
+
+    <TextView
+        android:id="@+id/Rprice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0.00000025"
+        android:textSize="16dp"
+        android:textAlignment="viewStart"
+        android:layout_marginHorizontal="2dp"
+        android:fontFamily="@font/lato"
+        android:textColor="#ffffff"
+        android:layout_weight="45" />
+
+    <ImageButton
+        android:id="@+id/Rdelete"
+        android:layout_width="50dp"
+        android:layout_height="30dp"
+        android:layout_marginRight="8dp"
+        android:cropToPadding="true"
+        android:padding="10dp"
+        android:scaleType="center"
+        android:background="@drawable/delete_alert_icon"
+        />
+
+
+</LinearLayout>

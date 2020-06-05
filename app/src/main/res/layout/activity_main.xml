@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="100"
+    android:background="@color/alert_parent_background"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+      <AutoCompleteTextView
+          android:id="@+id/select_symbol"
+          android:layout_width="140dp"
+          android:layout_height="50dp"
+          android:text="BTCUSDT"
+          android:textSize="21dp"
+          android:fontFamily="@font/lato"
+          android:drawableRight="@drawable/ic_arrow_drop_down_black_24dp"
+          android:textColor="#FFFFFF"
+          android:gravity="center"
+          android:layout_gravity="center"
+          android:background="@null"/>
+
+        <TextView
+            android:id="@+id/variable_price"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:layout_marginBottom="7dp"
+            android:fontFamily="@font/lato"
+            android:gravity="center"
+            android:textColor="#4CAF50"
+            android:textSize="25dp"
+            android:textStyle="bold" />
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="28dp"
+            android:text="Set Alert"
+            android:textSize="15dp"
+            android:fontFamily="@font/lato"
+            android:textColor="@color/text_color"
+            android:layout_marginLeft="15dp"/>
+
+        <EditText
+            android:id="@+id/alert_price"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:textSize="20dp"
+            android:textColor="#FFFFFF"
+            android:fontFamily="@font/lato"
+            android:inputType="numberDecimal"
+            android:background="@drawable/alert_price_back"
+            android:gravity="center"
+            android:layout_marginBottom="5dp"
+            android:layout_marginHorizontal="15dp"
+            />
+
+        <TextView
+            android:layout_width="60dp"
+            android:layout_height="28dp"
+            android:layout_marginTop="5dp"
+            android:text="Note"
+            android:textSize="15dp"
+            android:fontFamily="@font/lato"
+            android:textColor="@color/text_color"
+            android:layout_marginLeft="15dp"/>
+
+        <EditText
+            android:id="@+id/note"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:textSize="20dp"
+            android:fontFamily="@font/lato"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/note_design"
+            android:padding="7dp"
+            android:layout_marginHorizontal="15dp"/>
+        <Button
+            android:id="@+id/alert_btn"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:text="Create Alert"
+            android:textSize="20dp"
+            android:fontFamily="@font/lato"
+            android:onClick="create_alert"
+            android:textAllCaps="false"
+            android:background="#F2DA07"
+            android:layout_marginTop="17dp"
+            android:layout_marginBottom="15dp"
+            android:layout_marginHorizontal="15dp"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:background="#000000"
+            android:layout_marginBottom="5dp"/>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="10dp"
+        >
+
+      <CheckBox
+            android:id="@+id/hide_other_pairs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hide other pairs"
+            android:textColor="#FFFFFF"
+            android:textSize="18dp"
+            android:fontFamily="@font/lato"
+            android:onClick="hideOtherPairs"
+            android:layout_alignParentLeft="true"
+          android:layout_marginLeft="15dp"
+            />
+
+        <Button
+          android:id="@+id/clear_all"
+          android:layout_width="75dp"
+          android:layout_height="25dp"
+          android:text="Clear all"
+          android:textSize="14dp"
+          android:textAlignment="center"
+          android:fontFamily="@font/lato"
+          android:onClick="clearAll"
+          android:textAllCaps="false"
+          android:textColor="#ffffff"
+          android:background="@drawable/alert_price_back"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="15dp"
+          />
+
+        </RelativeLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical"
+        android:background="@color/alert_parent_background"/>
+
+</LinearLayout>
