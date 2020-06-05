@@ -17,7 +17,7 @@
 - Android Services
 - Notifications
 
-#### Upcoming things in next version: Wallet maintenance :+1:
+#### Upcoming Feature : Wallet maintenance :+1:
 
 #### Screenshots: 
 
