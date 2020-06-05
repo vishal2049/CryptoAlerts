@@ -17,10 +17,12 @@
 - Android Services
 - Notifications
 
-#### Upcoming things in next version: Wallet maintenance 
+#### Upcoming things in next version: Wallet maintenance :+1:
 
 #### Screenshots: 
 
-<br><br><IMG src="images/note.png" width="350" height="640"> <br><br><IMG src="images/alert_notification.png" width="350" height="640">
- 
- <br><br><IMG src="images/hidePairs.png" width="350" height="640">
+Hide other Pairs             |  Alert notification
+:-------------------------:|:-------------------------:
+![](images/hidePairs.png)  |  ![](images/alert_notification.png)
+
+<IMG src="images/note.png" width="440" height="740"/>  | 
