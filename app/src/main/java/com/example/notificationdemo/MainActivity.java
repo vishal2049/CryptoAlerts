@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
     Button alert_btn, clear_all;
     CheckBox hide_o_pairs;
     ArrayList symbolsArray;
-    String selectedItem = "BTCUSDT"; //setting default symbol to AutoCompleteTV
+    String selectedItem = "BTCUSDT"; //setting default symbol to AutoCompleteTV.
     String currentPrice = "0";
     myDatabase mDatabase;
 
