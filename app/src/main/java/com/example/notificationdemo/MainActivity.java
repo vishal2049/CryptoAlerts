@@ -40,7 +40,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
+//making changes
 public class MainActivity extends AppCompatActivity implements RecyclerViewClickListner {
     RequestQueue mRequestQueue;
     String url = "https://api.binance.com/api/v3/ticker/price";
