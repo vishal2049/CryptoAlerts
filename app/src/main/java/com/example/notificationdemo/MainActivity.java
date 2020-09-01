@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 //making changes
+// test change2
 public class MainActivity extends AppCompatActivity implements RecyclerViewClickListner {
     RequestQueue mRequestQueue;
     String url = "https://api.binance.com/api/v3/ticker/price";
