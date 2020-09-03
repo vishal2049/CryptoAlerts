@@ -2,6 +2,7 @@ package com.example.notificationdemo;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -113,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
         Intent intent = new Intent(this, fetchAllPriceService.class);
         intent.putExtra("url", url);
         intent.putExtra("selectedItem", selectedItem);
-        startService(intent);
+        ContextCompat.startForegroundService(this,intent);
     }
 
     private void loadSymbols() {

@@ -1,10 +1,13 @@
 package com.example.notificationdemo;
 
 import android.app.IntentService;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -19,6 +22,8 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,6 +32,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Random;
 
 public class fetchAllPriceService extends IntentService {
     RequestQueue mRequestQueue;
@@ -34,6 +40,7 @@ public class fetchAllPriceService extends IntentService {
     myDatabase mDB = new myDatabase(this);
     ArrayList<AlertTableData> tempArray;
     NotificationManager manager;
+    private static final String CHANNEL_FOREGROUND_ID = "foregroundNoti";
 
     public fetchAllPriceService() {
         super("fetchAllPriceService");
@@ -50,6 +57,10 @@ public class fetchAllPriceService extends IntentService {
     protected void onHandleIntent(@Nullable Intent intent) {
         String url = intent.getStringExtra("url");
         mRequestQueue = Volley.newRequestQueue(this);
+
+        // making app in foreground by foreground notification only
+        createNotificationChannel();
+        createNotification();
 
         //looping to get price at specific interval
         while (true) {
@@ -81,16 +92,16 @@ public class fetchAllPriceService extends IntentService {
                         String price = ob1.getString("price");
 
                         //sending broadcast to UI for selected symbol
-                        if(symbol.equals(selectedItem)) {
+                        if (symbol.equals(selectedItem)) {
                             if (selectedItem.endsWith("USDT") || selectedItem.endsWith("USDC")) {
                                 float f = Float.parseFloat(price);
                                 String str = String.format("%.2f", f);
                                 EventBus.getDefault().post(new priceMapBroadcast(str));
-                            }else
+                            } else
                                 EventBus.getDefault().post(new priceMapBroadcast(price));
                         }
                         //Checking for every alerts
-                        checkForALerts(symbol,price);
+                        checkForALerts(symbol, price);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -109,44 +120,70 @@ public class fetchAllPriceService extends IntentService {
     }
 
     private void checkForALerts(String symbol, String price) {
-            for (AlertTableData data1 : tempArray) {
-                if (symbol.equals(data1.getSymbol())){
-                 if (data1.getUpDown().equals("UP")) {
+        for (AlertTableData data1 : tempArray) {
+            if (symbol.equals(data1.getSymbol())) {
+                if (data1.getUpDown().equals("UP")) {
                     if (Double.parseDouble(data1.getPrice()) <= Double.parseDouble(price)) {
                         //Show notification
                         String msg = data1.getSymbol() + ": " + "Price above " + data1.getPrice();
-                         showNotification(msg, data1.getNote());
+                        showNotification(msg, data1.getNote());
 
-                         EventBus.getDefault().post(new priceMapBroadcast(true,data1.getPrice()));
-                         mDB.deleteData(data1.getPrice());
+                        EventBus.getDefault().post(new priceMapBroadcast(true, data1.getPrice()));
+                        mDB.deleteData(data1.getPrice());
                     }
-                 }
+                }
                 if (data1.getUpDown().equals("DOWN")) {
                     if (Double.parseDouble(data1.getPrice()) >= Double.parseDouble(price)) {
-                         //Show notification
+                        //Show notification
                         String msg = data1.getSymbol() + ": " + "Price below " + data1.getPrice();
                         showNotification(msg, data1.getNote());
 
-                        EventBus.getDefault().post(new priceMapBroadcast(true,data1.getPrice()));
+                        EventBus.getDefault().post(new priceMapBroadcast(true, data1.getPrice()));
                         mDB.deleteData(data1.getPrice());
                     }
                 }
             }
-            }
+        }
     }
-
+// alert notification
     private void showNotification(String updown, String note) {
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this,myNotificationChannels.CHANNEL_ID_1)
+        int m = new Random().nextInt(100) + 1;
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, myNotificationChannels.CHANNEL_ID_1)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setDefaults(NotificationCompat.DEFAULT_ALL) // for lower versions
-                .setSmallIcon(R.drawable.ic_sentiment_satisfied_black_24dp)
-                .setColor(Color.YELLOW)
+                .setSmallIcon(R.drawable.bell2)
                 .setContentTitle(updown)
                 .setContentText(note)
-                .setVibrate(new long[]{1000,1000,1000})
+                .setColor(Color.RED)
+                .setVibrate(new long[]{1000, 1000, 1000})
                 .setOnlyAlertOnce(false);
-        manager.notify(1, builder.build());
+        manager.notify(m, builder.build());
+    }
+//foreground notification
+    private void createNotification() {
+        Intent contentIntent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this,
+                0, contentIntent, 0);
+
+        NotificationCompat.Builder builder2 = new NotificationCompat.Builder(this, CHANNEL_FOREGROUND_ID)
+                .setSmallIcon(R.drawable.not)
+                .setContentTitle("Alerts are active")
+//                .setContentText("click to Stop")
+                .setColor(Color.GREEN)
+                .setContentIntent(pendingIntent)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        startForeground(111, builder2.build());
+    }
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)//app sdk ver & device ver
+        {
+            NotificationChannel channel1 = new NotificationChannel(CHANNEL_FOREGROUND_ID, "Foreground channel", NotificationManager.IMPORTANCE_HIGH);
+            channel1.setDescription("This channel is for video.");
+
+            NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            manager.createNotificationChannel(channel1);
+        }
+
     }
 
 }
