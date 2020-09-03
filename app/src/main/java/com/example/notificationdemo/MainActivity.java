@@ -227,28 +227,30 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
         super.onStop();
     }
 
-    public void create_alert(View view) {
-       if(! alert_price.getText().toString().equals(""))
-        if (isPriceDuplicate())
-            Toast.makeText(this, "Already added", Toast.LENGTH_SHORT).show();
-        else {
-            String updown;
-            if (Double.parseDouble(alert_price.getText().toString()) > Double.parseDouble(getCurrentPrice()))
-                updown = "UP";
-            else if (Double.parseDouble(alert_price.getText().toString()) < Double.parseDouble(getCurrentPrice()))
-                updown = "DOWN";
-            else return;
-            boolean isAdded = mDatabase.addData(select_symbol.getText().toString(), alert_price.getText().toString(), note.getText().toString(), updown);
-            if (isAdded) {
-                Toast.makeText(this, "Done", Toast.LENGTH_SHORT).show();
-                Cursor cursor2 = mDatabase.getAllData();
-                if (cursor2.moveToLast()) {
-                    alert_list.add(new model(cursor2.getString(0), cursor2.getString(1), R.drawable.delete_alert_icon));
-                    makeAdapter(alert_list);
-                }
-                cursor2.close();
-            } else
-                Toast.makeText(this, "failed to add", Toast.LENGTH_SHORT).show();
+    public void create_alert(View view) throws Exception {
+        if (!alert_price.getText().toString().equals("")) {
+            String textViewPrice = alert_price.getText().toString();
+            if (isPriceDuplicate())
+                Toast.makeText(this, "Already added", Toast.LENGTH_SHORT).show();
+            else {
+                String updown;
+                if (Double.parseDouble(textViewPrice) > Double.parseDouble(getCurrentPrice())) // getting crash here
+                    updown = "UP";
+                else if (Double.parseDouble(textViewPrice) < Double.parseDouble(getCurrentPrice()))
+                    updown = "DOWN";
+                else return;
+                boolean isAdded = mDatabase.addData(select_symbol.getText().toString(), textViewPrice, note.getText().toString(), updown);
+                if (isAdded) {
+                    Toast.makeText(this, "Done", Toast.LENGTH_SHORT).show();
+                    Cursor cursor2 = mDatabase.getAllData();
+                    if (cursor2.moveToLast()) {
+                        alert_list.add(new model(cursor2.getString(0), cursor2.getString(1), R.drawable.delete_alert_icon));
+                        makeAdapter(alert_list);
+                    }
+                    cursor2.close();
+                } else
+                    Toast.makeText(this, "failed to add", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

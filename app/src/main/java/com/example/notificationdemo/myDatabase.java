@@ -37,7 +37,7 @@ public class myDatabase extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean addData(String symbol, String price, String note, String upDown) {
+     public boolean addData(String symbol, String price, String note, String upDown) {
         mdb = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COL1, symbol);
@@ -49,7 +49,7 @@ public class myDatabase extends SQLiteOpenHelper {
         return result != -1; // return true in case result is positive
     }
 
-    public Cursor getAllData() {
+     public Cursor getAllData() {
         mdb = this.getReadableDatabase();
         String query = "SELECT * FROM " + ALERT_PRICE_TABLE;
         return mdb.rawQuery(query, null);

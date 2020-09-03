@@ -16,6 +16,8 @@ public class myNotificationChannels extends Application {
         {
             NotificationChannel channel1 = new NotificationChannel(CHANNEL_ID_1,"alert channel", NotificationManager.IMPORTANCE_HIGH);
             channel1.setDescription("This channel is for Alerts.");
+//            channel1.setVibrationPattern(new long[]{1000, 1000, 1000});
+            channel1.enableVibration(true);
 
             NotificationManager manager= (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             assert manager != null;

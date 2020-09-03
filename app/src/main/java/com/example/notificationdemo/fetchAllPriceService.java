@@ -7,7 +7,10 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -148,6 +151,8 @@ public class fetchAllPriceService extends IntentService {
 // alert notification
     private void showNotification(String updown, String note) {
         int m = new Random().nextInt(100) + 1;
+        int n = new Random().nextInt(100)+2;
+//        Uri alertSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, myNotificationChannels.CHANNEL_ID_1)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setDefaults(NotificationCompat.DEFAULT_ALL) // for lower versions
@@ -156,8 +161,9 @@ public class fetchAllPriceService extends IntentService {
                 .setContentText(note)
                 .setColor(Color.RED)
                 .setVibrate(new long[]{1000, 1000, 1000})
+                .setSound(Settings.System.DEFAULT_NOTIFICATION_URI)
                 .setOnlyAlertOnce(false);
-        manager.notify(m, builder.build());
+        manager.notify(m+n, builder.build());
     }
 //foreground notification
     private void createNotification() {
@@ -171,8 +177,8 @@ public class fetchAllPriceService extends IntentService {
 //                .setContentText("click to Stop")
                 .setColor(Color.GREEN)
                 .setContentIntent(pendingIntent)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-        startForeground(111, builder2.build());
+                .setPriority(NotificationCompat.PRIORITY_LOW);
+        startForeground(150, builder2.build());
     }
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)//app sdk ver & device ver
