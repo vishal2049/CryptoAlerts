@@ -1,11 +1,8 @@
-package com.example.notificationdemo;
+package com.thetechbeing.CryptoAlerts;
 
-import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.TextView;
 

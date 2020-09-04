@@ -1,4 +1,4 @@
-package com.example.notificationdemo;
+package com.thetechbeing.CryptoAlerts;
 
 import android.content.ContentValues;
 import android.content.Context;

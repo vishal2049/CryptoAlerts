@@ -1,4 +1,4 @@
-package com.example.notificationdemo;
+package com.thetechbeing.CryptoAlerts;
 
 
 // This class is used to hold one row Data each time from DB

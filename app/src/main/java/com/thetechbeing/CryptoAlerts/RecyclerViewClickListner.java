@@ -1,6 +1,4 @@
-package com.example.notificationdemo;
-
-import android.content.Context;
+package com.thetechbeing.CryptoAlerts;
 
 public interface RecyclerViewClickListner {
     void onImageClick(int position, String Rprice);

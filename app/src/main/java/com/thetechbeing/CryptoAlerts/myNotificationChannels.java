@@ -1,4 +1,4 @@
-package com.example.notificationdemo;
+package com.thetechbeing.CryptoAlerts;
 
 import android.app.Application;
 import android.app.NotificationChannel;
