@@ -11,6 +11,9 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -19,6 +22,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
     AutoCompleteTextView select_symbol;
     TextView variable_price;
     EditText alert_price, note;
-    Button alert_btn, clear_all;
+    Button alert_btn, clear_all,menu_btn;
     CheckBox hide_o_pairs;
     ArrayList symbolsArray;
     String selectedItem = "BTCUSDT"; //setting default symbol to AutoCompleteTV.
@@ -73,6 +77,41 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
 
         //set symbols in AutoCompleteTextView
         loadSymbols();
+
+        //set menus
+        menu_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PopupMenu popupMenu = new PopupMenu(MainActivity.this,menu_btn);
+                popupMenu.getMenuInflater().inflate(R.menu.menufile,popupMenu.getMenu());
+
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch(item.getItemId())
+                        {
+                            case R.id.theme:
+                                Toast.makeText(MainActivity.this,"coming soon",Toast.LENGTH_LONG).show();
+                                return true;
+                            case R.id.settings:
+                                Toast.makeText(MainActivity.this,"coming soon",Toast.LENGTH_LONG).show();
+                                return true;
+                            case R.id.premium:
+                                Toast.makeText(MainActivity.this,"coming soon",Toast.LENGTH_LONG).show();
+                                return true;
+                            case R.id.contact:
+                                showmessage("Contact details","CONTACT@THETECHBEING.TK\n(Any feedback appreciated)");
+                                return true;
+                            case R.id.about:
+                                showmessage("About app","Crypto Alert can be used by those who are looking for an alternate platform to get free instant alerts from Binance exchange.\nThe unique feature that you will find here is the custom notes which will help you to track why you have set the alert.\n\nCRYPTO ALERTS\nversion 1.0");
+                                return true;
+                        }
+                        return true;
+                    }
+                });
+                popupMenu.show();
+            }
+        });
 
         // setting listner to AutoCompleteTV & sending its selection to service
         select_symbol.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -139,6 +178,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
         alert_btn = findViewById(R.id.alert_btn);
         hide_o_pairs = findViewById(R.id.hide_other_pairs);
         clear_all = findViewById(R.id.clear_all);
+        menu_btn = findViewById(R.id.menu_btn);
 
 
         // creating volley for HTTP request
@@ -299,4 +339,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
         makeAdapter(alert_list); // displaying
     }
 
+
 }
+
