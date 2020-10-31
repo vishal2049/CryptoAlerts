@@ -30,7 +30,7 @@ import java.util.Random;
 
 public class fetchAllPriceService extends IntentService {
     RequestQueue mRequestQueue;
-    String selectedItem;
+    String selectedItem = "BTCUSDT";
     myDatabase mDB = new myDatabase(this);
     ArrayList<AlertTableData> tempArray;
     NotificationManager manager;
@@ -43,12 +43,14 @@ public class fetchAllPriceService extends IntentService {
 
     @Override
     public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
+        assert intent != null;
         selectedItem = intent.getStringExtra("selectedItem");
         return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
+        assert intent != null;
         String url = intent.getStringExtra("url");
         mRequestQueue = Volley.newRequestQueue(this);
 
@@ -89,8 +91,8 @@ public class fetchAllPriceService extends IntentService {
                         if (symbol.equals(selectedItem)) {
                             if (selectedItem.endsWith("USDT") || selectedItem.endsWith("USDC")) {
                                 float f = Float.parseFloat(price);
-                                String str = String.format("%.2f", f);
-                                EventBus.getDefault().post(new priceMapBroadcast(str));
+                                //String str = String.format("%.2f", f);
+                                EventBus.getDefault().post(new priceMapBroadcast(price));
                             } else
                                 EventBus.getDefault().post(new priceMapBroadcast(price));
                         }
@@ -99,7 +101,7 @@ public class fetchAllPriceService extends IntentService {
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Log.d("myTAG", "ERROR: " + e.getMessage());
+                    Log.d("myTAG", "VOLLEY ERROR: " + e.getMessage());
                 }
             }
         }, new Response.ErrorListener() {
@@ -175,7 +177,7 @@ public class fetchAllPriceService extends IntentService {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)//app sdk ver & device ver
         {
             NotificationChannel channel1 = new NotificationChannel(CHANNEL_FOREGROUND_ID, "Foreground channel", NotificationManager.IMPORTANCE_HIGH);
-            channel1.setDescription("This channel is for video.");
+            channel1.setDescription("Notification channel");
 
             NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             manager.createNotificationChannel(channel1);

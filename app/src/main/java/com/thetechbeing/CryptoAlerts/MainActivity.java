@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
     EditText alert_price, note;
     Button alert_btn, clear_all,menu_btn;
     CheckBox hide_o_pairs;
-    ArrayList symbolsArray;
+    ArrayList<String> symbolsArray;
     String selectedItem = "BTCUSDT"; //setting default symbol to AutoCompleteTV.
     String currentPrice = "0";
     myDatabase mDatabase;
@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
     }
 
     private void loadSymbols() {
-        symbolsArray = new ArrayList();
+        symbolsArray = new ArrayList<String>();
         select_symbol.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -208,14 +208,14 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Log.d("myTAG", "ERROR: " + e.getMessage());
+                    Log.d("myTAG", "VERROR: " + e.getMessage());
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d("myTAG", "status code: " + error.getMessage());
-                Log.d("myTAG", "status code: " + error.networkResponse.statusCode);
+//                Log.d("myTAG", "status code: " + error.networkResponse.statusCode);
             }
         });
         mRequestQueue.add(request);
@@ -262,7 +262,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
         super.onStop();
     }
 
-    public void create_alert(View view) throws Exception {
+    public void create_alert(View view) {
         if (!alert_price.getText().toString().equals("")) {
             String textViewPrice = alert_price.getText().toString();
             if (isPriceDuplicate())
