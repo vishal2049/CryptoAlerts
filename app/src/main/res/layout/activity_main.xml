@@ -28,8 +28,8 @@
 
         <Button
             android:id="@+id/menu_btn"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
             android:layout_alignParentRight="true"
             android:layout_marginRight="15dp"
             android:layout_marginTop="8dp"
@@ -105,7 +105,7 @@
             android:fontFamily="@font/lato"
             android:onClick="create_alert"
             android:textAllCaps="false"
-            android:background="#F2DA07"
+            android:background="@color/alert_price_background"
             android:layout_marginTop="17dp"
             android:layout_marginBottom="15dp"
             android:layout_marginHorizontal="15dp"
@@ -113,7 +113,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="10dp"
-            android:background="#000000"
+            android:background="#3E1934"
             android:layout_marginBottom="5dp"/>
 
     </LinearLayout>
@@ -148,8 +148,8 @@
           android:fontFamily="@font/lato"
           android:onClick="clearAll"
           android:textAllCaps="false"
-          android:textColor="#ffffff"
-          android:background="@drawable/alert_price_back"
+            android:textColor="#ffffff"
+            android:background="@drawable/alert_btn_back"
             android:layout_alignParentRight="true"
             android:layout_marginRight="15dp"
           />
