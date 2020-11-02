@@ -1,17 +1,10 @@
 package com.thetechbeing.CryptoAlerts;
 
 class priceMapBroadcast {
-    String selectedPrice;
-    String hitPrice;
-    boolean isRefereshRecycler;
+    String price;
 
     public priceMapBroadcast(String selectedPrice) {
-        this.selectedPrice = selectedPrice;
-    }
-
-    public priceMapBroadcast(boolean isRefereshRecycler, String hitPrice) {
-        this.isRefereshRecycler = isRefereshRecycler;
-        this.hitPrice = hitPrice;
+        this.price = selectedPrice;
     }
 
 }

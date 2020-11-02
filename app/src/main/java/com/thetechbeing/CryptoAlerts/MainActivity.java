@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -47,15 +48,17 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
     RecyclerView recyclerView;
     myAdapter mAdapter;
     List<model> alert_list = new ArrayList<>();
-    AutoCompleteTextView select_symbol;
+    AutoCompleteTextView symbol_atv;
     TextView variable_price;
     EditText alert_price, note;
-    Button alert_btn, clear_all,menu_btn;
+    Button alert_btn, clear_all, menu_btn;
     CheckBox hide_o_pairs;
-    ArrayList<String> symbolsArray;
+    ArrayList<String> symbolsList = new ArrayList<>();
     String selectedItem = "BTCUSDT"; //setting default symbol to AutoCompleteTV.
     String currentPrice = "0";
     myDatabase mDatabase;
+    private static long back_pressed_time;
+    private static long period = 2000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,20 +88,11 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
                     public boolean onMenuItemClick(MenuItem item) {
                         switch(item.getItemId())
                         {
-                            case R.id.theme:
-                                Toast.makeText(MainActivity.this,"coming soon",Toast.LENGTH_LONG).show();
-                                return true;
-                            case R.id.settings:
-                                Toast.makeText(MainActivity.this,"coming soon",Toast.LENGTH_LONG).show();
-                                return true;
-                            case R.id.premium:
-                                Toast.makeText(MainActivity.this,"coming soon",Toast.LENGTH_LONG).show();
-                                return true;
                             case R.id.contact:
                                 showmessage("Contact details","CONTACT@THETECHBEING.TK\n(Any feedback appreciated)");
                                 return true;
                             case R.id.about:
-                                showmessage("About app","Crypto Alert can be used by those who are looking for an alternate platform to get free instant alerts from Binance exchange.\nThe unique feature that you will find here is the custom notes which will help you to track why you have set the alert.\n\nCRYPTO ALERTS\nversion 1.0");
+                                showmessage("About app", "Crypto Alert can be used by those who are looking for an alternate platform to get free instant alerts from Binance exchange.\nThe unique feature that you will find here is the custom notes which will help you to track each alert.\n\nCRYPTO ALERTS\nversion 1.0");
                                 return true;
                         }
                         return true;
@@ -109,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
         });
 
         // setting listner to AutoCompleteTV & sending its selection to service
-        select_symbol.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        symbol_atv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String selectedItem = (String) parent.getItemAtPosition(position);
@@ -141,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
             while (cursor1.moveToNext())
                 alert_list.add(new model(cursor1.getString(0), cursor1.getString(1), R.drawable.delete_alert_icon));
         }
-            cursor1.close();
+        cursor1.close();
     }
 
     private void startIntentService(String url, String selectedItem) {
@@ -152,21 +146,20 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
     }
 
     private void loadSymbols() {
-        symbolsArray = new ArrayList<String>();
-        select_symbol.setOnTouchListener(new View.OnTouchListener() {
+        symbol_atv.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_expandable_list_item_1, symbolsList));
+
+        symbol_atv.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                select_symbol.showDropDown();
+                symbol_atv.showDropDown();
                 return false;
             }
         });
-        select_symbol.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_expandable_list_item_1, symbolsArray));
-
     }
 
     private void initConfigurations() {
         //Binding views
-        select_symbol = findViewById(R.id.select_symbol);
+        symbol_atv = findViewById(R.id.select_symbol);
         variable_price = findViewById(R.id.variable_price);
         alert_price = findViewById(R.id.alert_price);
         note = findViewById(R.id.note);
@@ -204,11 +197,11 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
                     for (int i = 0; i < response.length(); i++) {
                         JSONObject ob1 = response.getJSONObject(i);
                         String symbol = ob1.getString("symbol");
-                        symbolsArray.add(symbol);
+                        symbolsList.add(symbol);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Log.d("myTAG", "VERROR: " + e.getMessage());
+                    Log.d("myTAG", "ERROR: " + e.getMessage());
                 }
             }
         }, new Response.ErrorListener() {
@@ -230,13 +223,17 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
 
     // Recieving Broadcaste messages
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onPriceMapBroadcast( priceMapBroadcast event) {
+    public void onPriceMapBroadcast(priceMapBroadcast event) {
+        variable_price.setText(event.price);
+        setCurrentPrice(event.price);
 
-        variable_price.setText(event.selectedPrice);
-        setCurrentPrice(event.selectedPrice);
+    }
 
-        if(event.isRefereshRecycler) {
-            mDatabase.deleteData(event.hitPrice);
+    // Recieving Broadcaste messages
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onRefreshRecyclerBroadcast(RefreshRecycler ref) {
+        if (ref.isRefereshRecycler) {
+            mDatabase.deleteData(ref.hitPrice);
             refereshRecyclerView();
         }
 
@@ -265,35 +262,28 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
     public void create_alert(View view) {
         if (!alert_price.getText().toString().equals("")) {
             String textViewPrice = alert_price.getText().toString();
-            if (isPriceDuplicate())
-                Toast.makeText(this, "Already added", Toast.LENGTH_SHORT).show();
+            alert_price.setTextColor(Color.parseColor("#FFFFFF"));
+            String updown;
+            if (Double.parseDouble(textViewPrice) > Double.parseDouble(getCurrentPrice()))
+                updown = "UP";
+            else if (Double.parseDouble(textViewPrice) < Double.parseDouble(getCurrentPrice()))
+                updown = "DOWN";
             else {
-                String updown;
-                if (Double.parseDouble(textViewPrice) > Double.parseDouble(getCurrentPrice())) // getting crash here
-                    updown = "UP";
-                else if (Double.parseDouble(textViewPrice) < Double.parseDouble(getCurrentPrice()))
-                    updown = "DOWN";
-                else return;
-                boolean isAdded = mDatabase.addData(select_symbol.getText().toString(), textViewPrice, note.getText().toString(), updown);
-                if (isAdded) {
-                    Toast.makeText(this, "Done", Toast.LENGTH_SHORT).show();
-                    Cursor cursor2 = mDatabase.getAllData();
-                    if (cursor2.moveToLast()) {
-                        alert_list.add(new model(cursor2.getString(0), cursor2.getString(1), R.drawable.delete_alert_icon));
-                        makeAdapter(alert_list);
-                    }
-                    cursor2.close();
-                } else
-                    Toast.makeText(this, "failed to add", Toast.LENGTH_SHORT).show();
+                alert_price.setTextColor(Color.parseColor("#F44336"));
+                return;
             }
+            boolean isAdded = mDatabase.addData(symbol_atv.getText().toString(), textViewPrice, note.getText().toString(), updown);
+            if (isAdded) {
+                Toast.makeText(this, "Done", Toast.LENGTH_SHORT).show();
+                Cursor cursor2 = mDatabase.getAllData();
+                if (cursor2.moveToLast()) {
+                    alert_list.add(new model(cursor2.getString(0), cursor2.getString(1), R.drawable.delete_alert_icon));
+                    makeAdapter(alert_list);
+                }
+                cursor2.close();
+            } else
+                Toast.makeText(this, "already added", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    private boolean isPriceDuplicate() {
-        for (int i = 0; i < alert_list.size(); i++)
-            if (alert_list.get(i).getrprice().equals(alert_price.getText().toString()))
-                return true;
-        return false;
     }
 
     private void showmessage(String title, String message) {
@@ -327,13 +317,20 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
         Iterator<model> itr = alert_list.iterator();
         while (itr.hasNext()) {
             model mod = itr.next();
-            if (!mod.getrsymbol().equals(select_symbol.getText().toString())) {
+            if (!mod.getrsymbol().equals(symbol_atv.getText().toString())) {
                 itr.remove();
             }
         }
         makeAdapter(alert_list); // displaying
     }
 
-
+    @Override
+    public void onBackPressed() {
+        if (back_pressed_time + period > System.currentTimeMillis())
+            super.onBackPressed();
+        else {
+            Toast.makeText(this, "Press again to Exit", Toast.LENGTH_SHORT).show();
+            back_pressed_time = System.currentTimeMillis();
+        }
+    }
 }
-

@@ -30,7 +30,7 @@ import java.util.Random;
 
 public class fetchAllPriceService extends IntentService {
     RequestQueue mRequestQueue;
-    String selectedItem = "BTCUSDT";
+    String selectedItem;
     myDatabase mDB = new myDatabase(this);
     ArrayList<AlertTableData> tempArray;
     NotificationManager manager;
@@ -91,8 +91,8 @@ public class fetchAllPriceService extends IntentService {
                         if (symbol.equals(selectedItem)) {
                             if (selectedItem.endsWith("USDT") || selectedItem.endsWith("USDC")) {
                                 float f = Float.parseFloat(price);
-                                //String str = String.format("%.2f", f);
-                                EventBus.getDefault().post(new priceMapBroadcast(price));
+                                String str = String.format("%.2f", f);
+                                EventBus.getDefault().post(new priceMapBroadcast(str));
                             } else
                                 EventBus.getDefault().post(new priceMapBroadcast(price));
                         }
@@ -101,13 +101,13 @@ public class fetchAllPriceService extends IntentService {
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Log.d("myTAG", "VOLLEY ERROR: " + e.getMessage());
+                    Log.d("myTAG", "ERROR: " + e.getMessage());
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.d("myTAG", "onErrorResponse: ");
+//                Log.d("myTAG", "onErrorResponse: ");
                 Log.d("myTAG", "status code: " + error.getMessage());
 //                Log.d("myTAG", "status code: " + error.networkResponse.statusCode);
             }
@@ -124,7 +124,7 @@ public class fetchAllPriceService extends IntentService {
                         String msg = data1.getSymbol() + ": " + "Price above " + data1.getPrice();
                         showNotification(msg, data1.getNote());
 
-                        EventBus.getDefault().post(new priceMapBroadcast(true, data1.getPrice()));
+                        EventBus.getDefault().post(new RefreshRecycler(true, data1.getPrice()));
                         mDB.deleteData(data1.getPrice());
                     }
                 }
@@ -134,14 +134,15 @@ public class fetchAllPriceService extends IntentService {
                         String msg = data1.getSymbol() + ": " + "Price below " + data1.getPrice();
                         showNotification(msg, data1.getNote());
 
-                        EventBus.getDefault().post(new priceMapBroadcast(true, data1.getPrice()));
+                        EventBus.getDefault().post(new RefreshRecycler(true, data1.getPrice()));
                         mDB.deleteData(data1.getPrice());
                     }
                 }
             }
         }
     }
-// alert notification
+
+    // alert notification
     private void showNotification(String updown, String note) {
         int m = new Random().nextInt(100) + 1;
         int n = new Random().nextInt(100)+2;
@@ -158,7 +159,8 @@ public class fetchAllPriceService extends IntentService {
                 .setOnlyAlertOnce(false);
         manager.notify(m+n, builder.build());
     }
-//foreground notification
+
+    //foreground notification
     private void createNotification() {
         Intent contentIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
@@ -177,9 +179,10 @@ public class fetchAllPriceService extends IntentService {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)//app sdk ver & device ver
         {
             NotificationChannel channel1 = new NotificationChannel(CHANNEL_FOREGROUND_ID, "Foreground channel", NotificationManager.IMPORTANCE_HIGH);
-            channel1.setDescription("Notification channel");
+            channel1.setDescription("standard channel");
 
             NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            assert manager != null;
             manager.createNotificationChannel(channel1);
         }
 
