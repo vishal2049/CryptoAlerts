@@ -18,18 +18,18 @@
             android:id="@+id/select_symbol"
             android:layout_width="140dp"
             android:layout_height="50dp"
-            android:text="BTCUSDT"
-            android:textSize="21dp"
-            android:fontFamily="@font/lato"
-            android:drawableRight="@drawable/ic_arrow_drop_down_black_24dp"
-            android:textColor="#FFFFFF"
+            android:layout_centerHorizontal="true"
             android:background="@null"
-            android:layout_centerHorizontal="true"/>
+            android:drawableRight="@drawable/ic_arrow_drop_down_black_24dp"
+            android:fontFamily="@font/lato"
+            android:text="BTCUSDT"
+            android:textColor="#FFFFFF"
+            android:textSize="21dp" />
 
         <Button
             android:id="@+id/menu_btn"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
+            android:layout_width="37dp"
+            android:layout_height="37dp"
             android:layout_alignParentRight="true"
             android:layout_marginRight="15dp"
             android:layout_marginTop="8dp"
@@ -50,7 +50,7 @@
             android:layout_marginBottom="7dp"
             android:fontFamily="@font/lato"
             android:gravity="center"
-            android:textColor="#4CAF50"
+            android:textColor="#05c78d"
             android:textSize="25dp"
             android:textStyle="bold" />
         <TextView

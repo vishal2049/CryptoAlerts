@@ -35,6 +35,7 @@ public class fetchAllPriceService extends IntentService {
     ArrayList<AlertTableData> tempArray;
     NotificationManager manager;
     private static final String CHANNEL_FOREGROUND_ID = "foregroundNoti";
+    String fprice;
 
     public fetchAllPriceService() {
         super("fetchAllPriceService");
@@ -89,10 +90,13 @@ public class fetchAllPriceService extends IntentService {
 
                         //sending broadcast to UI for selected symbol
                         if (symbol.equals(selectedItem)) {
-                            if (selectedItem.endsWith("USDT") || selectedItem.endsWith("USDC")) {
+                            if (selectedItem.endsWith("USDT")) {
                                 float f = Float.parseFloat(price);
-                                String str = String.format("%.2f", f);
-                                EventBus.getDefault().post(new priceMapBroadcast(str));
+                                if((selectedItem.equals("BTCUSDT") || selectedItem.equals("ETHUSDT")))
+                                    fprice = String.format("%.2f", f);
+                                else
+                                    fprice = String.format("%.5f", f);
+                                EventBus.getDefault().post(new priceMapBroadcast(fprice));
                             } else
                                 EventBus.getDefault().post(new priceMapBroadcast(price));
                         }
