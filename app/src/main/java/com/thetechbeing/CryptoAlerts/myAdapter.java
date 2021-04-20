@@ -14,7 +14,6 @@ import java.util.List;
 class myAdapter extends RecyclerView.Adapter<myAdapter.myViewHolder> {
     private List<model> alert_list;
     private RecyclerViewClickListner mlistner;
-//    private String RpriceForDB;
 
     //creating constructor to get List to be inflate on layout
     public myAdapter(List<model> alert_list,RecyclerViewClickListner mylistner) {
@@ -24,8 +23,8 @@ class myAdapter extends RecyclerView.Adapter<myAdapter.myViewHolder> {
 
     //creating ViewHolder class
     public class myViewHolder extends RecyclerView.ViewHolder {
-        private TextView Rsymbol, Rprice;
-        private ImageButton Rdelete;
+         TextView Rsymbol, Rprice;
+         ImageButton Rdelete;
 
         public myViewHolder(@NonNull View itemView) {
            super(itemView);
@@ -42,8 +41,12 @@ class myAdapter extends RecyclerView.Adapter<myAdapter.myViewHolder> {
             Rdelete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    model mod = alert_list.get(getAdapterPosition());
-                    mlistner.onImageClick(getAdapterPosition(),mod.getrprice());
+                    try {
+                        model mod = alert_list.get(getAdapterPosition());
+                        mlistner.onImageClick(getAdapterPosition(),mod.getrprice());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             });
         }

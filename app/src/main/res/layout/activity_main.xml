@@ -70,6 +70,7 @@
             android:textColor="#FFFFFF"
             android:fontFamily="@font/lato"
             android:inputType="numberDecimal"
+            android:digits="0123456789."
             android:background="@drawable/alert_price_back"
             android:gravity="center"
             android:layout_marginBottom="5dp"

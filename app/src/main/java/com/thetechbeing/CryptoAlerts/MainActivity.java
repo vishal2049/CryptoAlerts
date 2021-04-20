@@ -65,11 +65,15 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //initial settings for Views, recycler, Custom Adapter & Volley
+        //initial settings for Views, recycler & Volley
         initConfigurations();
 
         //creating list by fetching data from DATABASE
         prepareAlertListFromDB();
+
+        //creating custom adapter & sending list which has all data that we want to show on recycler
+        makeAdapter(alert_list);
+
         // request from API
         fetchAllSymbols();
 
@@ -92,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
                                 showmessage("Contact details","CONTACT@THETECHBEING.TK\n(Any feedback appreciated)");
                                 return true;
                             case R.id.about:
-                                showmessage("About app", "Crypto Alert can be used by those who are looking for an alternate platform to get free instant alerts from Binance exchange.\nThe unique feature that you will find here is the custom notes which will help you to track each alert.\n\nCRYPTO ALERTS\nversion 1.0");
+                                showmessage("About", "Crypto Alert can be used by those who are looking for an alternate platform to get free instant alerts from Binance exchange.\nThe unique feature that you will find here is the custom notes which will help you to track each alert.\n\nCRYPTO ALERTS\nversion 1.0");
                                 return true;
                         }
                         return true;
@@ -179,8 +183,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
         recyclerView = findViewById(R.id.recyclerView);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        //creating custom adapter & sending list which has all data that we want to show on recycler
-        makeAdapter(alert_list);
     }
 
     private void makeAdapter(List<model> alert_list) {
@@ -216,9 +218,14 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
 
     @Override
     public void onImageClick(int position, String Rprice) {
-        alert_list.remove(position);
-        mAdapter.notifyItemRemoved(position);
-        mDatabase.deleteData(Rprice);
+        try {
+            alert_list.remove(position);
+            mAdapter.notifyItemRemoved(position);
+            mDatabase.deleteData(Rprice);
+        } catch (Exception e) {
+            Toast.makeText(this,"try again",Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
     }
 
     // Recieving Broadcaste messages
@@ -229,7 +236,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
 
     }
 
-    // Recieving Broadcaste messages
+    // Recieving Broadcaste messages TODO
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefreshRecyclerBroadcast(RefreshRecycler ref) {
         if (ref.isRefereshRecycler) {
@@ -261,28 +268,36 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
 
     public void create_alert(View view) {
         if (!alert_price.getText().toString().equals("")) {
-            String textViewPrice = alert_price.getText().toString();
-            alert_price.setTextColor(Color.parseColor("#FFFFFF"));
-            String updown;
-            if (Double.parseDouble(textViewPrice) > Double.parseDouble(getCurrentPrice()))
-                updown = "UP";
-            else if (Double.parseDouble(textViewPrice) < Double.parseDouble(getCurrentPrice()))
-                updown = "DOWN";
-            else {
-                alert_price.setTextColor(Color.parseColor("#F44336"));
-                return;
-            }
-            boolean isAdded = mDatabase.addData(symbol_atv.getText().toString(), textViewPrice, note.getText().toString(), updown);
-            if (isAdded) {
-                Toast.makeText(this, "Done", Toast.LENGTH_SHORT).show();
-                Cursor cursor2 = mDatabase.getAllData();
-                if (cursor2.moveToLast()) {
-                    alert_list.add(new model(cursor2.getString(0), cursor2.getString(1), R.drawable.delete_alert_icon));
-                    makeAdapter(alert_list);
+
+            try {
+                String textViewPrice = alert_price.getText().toString().replace(',', '.');
+                String currentPrice = getCurrentPrice().replace(',', '.');
+                alert_price.setTextColor(Color.parseColor("#FFFFFF"));
+                String updown;
+                if (Double.parseDouble(textViewPrice) > Double.parseDouble(currentPrice))
+                    updown = "UP";
+                else if (Double.parseDouble(textViewPrice) < Double.parseDouble(currentPrice))
+                    updown = "DOWN";
+                else {
+                    alert_price.setTextColor(Color.parseColor("#F44336"));
+                    return;
                 }
-                cursor2.close();
-            } else
-                Toast.makeText(this, "already added", Toast.LENGTH_SHORT).show();
+                boolean isAdded = mDatabase.addData(symbol_atv.getText().toString(), textViewPrice, note.getText().toString(), updown);
+                if (isAdded) {
+                    Toast.makeText(this, "Done", Toast.LENGTH_SHORT).show();
+                    Cursor cursor2 = mDatabase.getAllData();
+                    if (cursor2.moveToLast()) {
+                        alert_list.add(new model(cursor2.getString(0), cursor2.getString(1), R.drawable.delete_alert_icon));
+                        makeAdapter(alert_list);
+                    }
+                    cursor2.close();
+                } else
+                    Toast.makeText(this, "already added", Toast.LENGTH_SHORT).show();
+            }
+            catch (NumberFormatException e) {
+                Toast.makeText(this, "Invalid input!", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+            }
         }
     }
 
@@ -312,7 +327,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
         }
     }
 
-    // important method- practice more
     private void displaySimilarPairs(List<model> alert_list) {
         Iterator<model> itr = alert_list.iterator();
         while (itr.hasNext()) {
