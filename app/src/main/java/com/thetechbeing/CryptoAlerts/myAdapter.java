@@ -43,7 +43,7 @@ class myAdapter extends RecyclerView.Adapter<myAdapter.myViewHolder> {
                 public void onClick(View v) {
                     try {
                         model mod = alert_list.get(getAdapterPosition());
-                        mlistner.onImageClick(getAdapterPosition(),mod.getrprice());
+                        mlistner.onImageClick(getAdapterPosition(),mod.getrprice(), mod.getrsymbol());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

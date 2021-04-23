@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -39,6 +40,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -217,11 +219,11 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
     }
 
     @Override
-    public void onImageClick(int position, String Rprice) {
+    public void onImageClick(int position, String Rprice, String Rsymbol) {
         try {
             alert_list.remove(position);
             mAdapter.notifyItemRemoved(position);
-            mDatabase.deleteData(Rprice);
+            mDatabase.deleteData(Rsymbol,Rprice);
         } catch (Exception e) {
             Toast.makeText(this,"try again",Toast.LENGTH_SHORT).show();
             e.printStackTrace();
@@ -236,12 +238,18 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
 
     }
 
-    // Recieving Broadcaste messages TODO
+    // Recieving Broadcaste messages TODO: item not removing instantly (figure out alert_list index=-1)
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefreshRecyclerBroadcast(RefreshRecycler ref) {
         if (ref.isRefereshRecycler) {
-            mDatabase.deleteData(ref.hitPrice);
-            refereshRecyclerView();
+           // int index = alert_list.indexOf(new model(ref.matchedSymbol,ref.matchedPrice,R.drawable.delete_alert_icon));
+            alert_list.remove(new model(ref.matchedSymbol,ref.matchedPrice,R.drawable.delete_alert_icon));
+           // Log.d("myTAG", "onRefreshRecyclerBroadcast: "+index);
+            //recyclerView.removeViewAt(index);
+            //mAdapter.notifyDataSetChanged();
+//            mAdapter.notifyItemRemoved();
+           // mDatabase.deleteData(ref.hitPrice);
+            //refereshRecyclerView();
         }
 
     }
@@ -282,7 +290,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
                     alert_price.setTextColor(Color.parseColor("#F44336"));
                     return;
                 }
-                boolean isAdded = mDatabase.addData(symbol_atv.getText().toString(), textViewPrice, note.getText().toString(), updown);
+                boolean isAdded = mDatabase.addData(symbol_atv.getText().toString(), textViewPrice, note.getText().toString(), updown,0,"0");
                 if (isAdded) {
                     Toast.makeText(this, "Done", Toast.LENGTH_SHORT).show();
                     Cursor cursor2 = mDatabase.getAllData();
@@ -334,6 +342,15 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
             if (!mod.getrsymbol().equals(symbol_atv.getText().toString())) {
                 itr.remove();
             }
+        }
+        //sorting list by price
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            alert_list.sort((o1,o2)-> {
+                        if (Double.parseDouble(o1.getrprice()) < (Double.parseDouble(o2.getrprice())))
+                            return -1;
+                        else
+                            return 1;
+                    });
         }
         makeAdapter(alert_list); // displaying
     }

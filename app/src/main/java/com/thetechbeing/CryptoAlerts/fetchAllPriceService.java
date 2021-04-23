@@ -26,6 +26,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Random;
 
 public class fetchAllPriceService extends IntentService {
@@ -62,7 +63,14 @@ public class fetchAllPriceService extends IntentService {
         //looping to get price at specific interval
         while (true) {
             fetchAllPriceOnService(url);
-
+//                    for(AlertTableData data : mDB.getAllDataList()){
+//                        long currentTimePlusInterval = Calendar.getInstance().getTimeInMillis() + data.getRepeatInterval()*60*1000;
+//                        Log.d("myTAG", "UP-currentTimePlusinterval: "+currentTimePlusInterval);
+//                        mDB.updateCount(data.getSymbol(),data.getDesiredPrice(),String.valueOf(currentTimePlusInterval));
+//                        for(AlertTableData data2 : mDB.getAllDataList()){
+//                        Log.d("myTAG", "UP-now: "+data2.getCount());}
+//
+//                    }
             try {
                 tempArray = mDB.getAllDataList(); // dont put it inside above function otherwise it block UI
                 Thread.sleep(2000);
@@ -75,6 +83,10 @@ public class fetchAllPriceService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
+        // if service restart then we need to make all count to zero otherwise it'll skip alert once
+//        for(AlertTableData data : mDB.getAllDataList()){
+//            mDB.updateCount(data.getSymbol(),data.getDesiredPrice(),"0");
+//        }
         manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
     }
 
@@ -92,7 +104,7 @@ public class fetchAllPriceService extends IntentService {
                         if (symbol.equals(selectedItem)) {
                             if (selectedItem.endsWith("USDT")) {
                                 float f = Float.parseFloat(price);
-                                if((selectedItem.equals("BTCUSDT") || selectedItem.equals("ETHUSDT")))
+                                if ((selectedItem.equals("BTCUSDT") || selectedItem.equals("ETHUSDT")))
                                     fprice = String.format("%.2f", f);
                                 else
                                     fprice = String.format("%.5f", f);
@@ -119,27 +131,74 @@ public class fetchAllPriceService extends IntentService {
         mRequestQueue.add(request);
     }
 
-    private void checkForALerts(String symbol, String price) {
+    private void checkForALerts(String symbol, String currentPrice) {
         for (AlertTableData data1 : tempArray) {
             if (symbol.equals(data1.getSymbol())) {
                 if (data1.getUpDown().equals("UP")) {
-                    if (Double.parseDouble(data1.getPrice()) <= Double.parseDouble(price)) {
-                        //Show notification
-                        String msg = data1.getSymbol() + ": " + "Price above " + data1.getPrice();
-                        showNotification(msg, data1.getNote());
+                    if (Double.parseDouble(data1.getDesiredPrice()) <= Double.parseDouble(currentPrice)) {
+                        // repeatAlert or not
+                        if (data1.getRepeatInterval() != 0) { // zero means repeat once
+                            if (data1.getCount().equals("0")) {
+                                long currentTimePlusInterval = Calendar.getInstance().getTimeInMillis() + data1.getRepeatInterval() * 60 * 1000;
+                                mDB.updateCount(symbol, data1.getDesiredPrice(), String.valueOf(currentTimePlusInterval));
+                                //Show notification
+                                String msg = data1.getSymbol() + ": " + "Price above " + data1.getDesiredPrice();
+                                showNotification(msg, data1.getNote());
+                            } else {
+                                if (Calendar.getInstance().getTimeInMillis() >= Long.parseLong(data1.getCount())) {
+                                    //make time zero
+                                    mDB.updateCount(symbol, data1.getDesiredPrice(), "0");
 
-                        EventBus.getDefault().post(new RefreshRecycler(true, data1.getPrice()));
-                        mDB.deleteData(data1.getPrice());
+                                    //dont invoke alert if price is very far after timer get zero
+                                    if (Double.parseDouble(data1.getDesiredPrice()) >= Double.parseDouble(currentPrice))
+                                        mDB.updateUpDown(symbol, data1.getDesiredPrice(), "UP");
+                                    else
+                                        mDB.updateUpDown(symbol, data1.getDesiredPrice(), "DOWN");
+
+                                }
+                            }
+                        } else {
+                            //Show notification
+                            String msg = data1.getSymbol() + ": " + "Price above " + data1.getDesiredPrice();
+                            showNotification(msg, data1.getNote());
+
+                            EventBus.getDefault().post(new RefreshRecycler(true, data1.getDesiredPrice(), data1.getSymbol()));
+                            mDB.deleteData(data1.getSymbol(), data1.getDesiredPrice());
+                        }
                     }
                 }
                 if (data1.getUpDown().equals("DOWN")) {
-                    if (Double.parseDouble(data1.getPrice()) >= Double.parseDouble(price)) {
-                        //Show notification
-                        String msg = data1.getSymbol() + ": " + "Price below " + data1.getPrice();
-                        showNotification(msg, data1.getNote());
+                    if (Double.parseDouble(data1.getDesiredPrice()) >= Double.parseDouble(currentPrice)) {
+                        // repeatAlert or not
+                        if (data1.getRepeatInterval() != 0) { // zero means repeat once
+                            if (data1.getCount().equals("0")) {
+                                long currentTimePlusInterval = Calendar.getInstance().getTimeInMillis() + data1.getRepeatInterval() * 60 * 1000;
+                                mDB.updateCount(symbol, data1.getDesiredPrice(), String.valueOf(currentTimePlusInterval));
 
-                        EventBus.getDefault().post(new RefreshRecycler(true, data1.getPrice()));
-                        mDB.deleteData(data1.getPrice());
+                                //Show notification
+                                String msg = data1.getSymbol() + ": " + "Price below " + data1.getDesiredPrice();
+                                showNotification(msg, data1.getNote());
+                            } else {
+                                if (Calendar.getInstance().getTimeInMillis() >= Long.parseLong(data1.getCount())) {
+                                    //make time zero
+                                    mDB.updateCount(symbol, data1.getDesiredPrice(), "0");
+
+                                    //dont invoke alert if price is very far after timer get zero
+                                    if (Double.parseDouble(data1.getDesiredPrice()) >= Double.parseDouble(currentPrice))
+                                        mDB.updateUpDown(symbol, data1.getDesiredPrice(), "UP");
+                                    else
+                                        mDB.updateUpDown(symbol, data1.getDesiredPrice(), "DOWN");
+
+                                }
+                            }
+                        } else {
+                            //Show notification
+                            String msg = data1.getSymbol() + ": " + "Price below " + data1.getDesiredPrice();
+                            showNotification(msg, data1.getNote());
+
+                            EventBus.getDefault().post(new RefreshRecycler(true, data1.getDesiredPrice(), data1.getSymbol()));
+                            mDB.deleteData(data1.getSymbol(), data1.getDesiredPrice());
+                        }
                     }
                 }
             }
@@ -149,7 +208,7 @@ public class fetchAllPriceService extends IntentService {
     // alert notification
     private void showNotification(String updown, String note) {
         int m = new Random().nextInt(100) + 1;
-        int n = new Random().nextInt(100)+2;
+        int n = new Random().nextInt(100) + 2;
 //        Uri alertSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, myNotificationChannels.CHANNEL_ID_1)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -161,7 +220,7 @@ public class fetchAllPriceService extends IntentService {
                 .setVibrate(new long[]{1000, 1000, 1000})
                 .setSound(Settings.System.DEFAULT_NOTIFICATION_URI)
                 .setOnlyAlertOnce(false);
-        manager.notify(m+n, builder.build());
+        manager.notify(m + n, builder.build());
     }
 
     //foreground notification
@@ -179,6 +238,7 @@ public class fetchAllPriceService extends IntentService {
                 .setPriority(NotificationCompat.PRIORITY_LOW);
         startForeground(150, builder2.build());
     }
+
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)//app sdk ver & device ver
         {

@@ -1,12 +1,14 @@
 package com.thetechbeing.CryptoAlerts;
 
 public class RefreshRecycler {
-    String hitPrice;
+    String matchedPrice;
+    String matchedSymbol;
     boolean isRefereshRecycler;
 
-    public RefreshRecycler(boolean isRefereshRecycler, String hitPrice) {
+    public RefreshRecycler(boolean isRefereshRecycler, String matchedPrice, String matchedSymbol) {
         this.isRefereshRecycler = isRefereshRecycler;
-        this.hitPrice = hitPrice;
+        this.matchedPrice = matchedPrice;
+        this.matchedSymbol = matchedSymbol;
     }
 
 }
